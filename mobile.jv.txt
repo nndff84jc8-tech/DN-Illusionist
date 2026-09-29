@@ -1,0 +1,51 @@
+/* mobile.js — navbar identica alla home (sottopagine) */
+(function () {
+  var header = document.querySelector("header");
+  if (!header) return;
+
+  /* Classi di servizio usate da mobile.css */
+  document.querySelectorAll(".hero").forEach(function (h) {
+    if (!h.querySelector(".hero-inner")) h.classList.add("nav-only");
+  });
+  if (document.getElementById("contact-form")) document.body.classList.add("contact-page");
+
+  /* Navbar: nera dopo lo scroll */
+  function navbarScroll() {
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    header.classList.toggle("scrolled", y > 50);
+  }
+  window.addEventListener("scroll", navbarScroll, { passive: true });
+  navbarScroll();
+
+  /* Menu hamburger (il bottone viene creato qui se manca) */
+  var menu = header.querySelector("nav.links");
+  if (!menu) return;
+  menu.id = menu.id || "menu";
+
+  var toggle = header.querySelector(".nav-toggle");
+  if (!toggle) {
+    toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "nav-toggle";
+    toggle.setAttribute("aria-label", "Apri menu");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", menu.id);
+    toggle.innerHTML = "<span></span><span></span><span></span>";
+    header.appendChild(toggle);
+  }
+
+  function setMenu(open) {
+    menu.classList.toggle("open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.setAttribute("aria-label", open ? "Chiudi menu" : "Apri menu");
+  }
+  toggle.addEventListener("click", function () {
+    setMenu(!menu.classList.contains("open"));
+  });
+  menu.querySelectorAll("a").forEach(function (a) {
+    a.addEventListener("click", function () { setMenu(false); });
+  });
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 900) setMenu(false);
+  });
+})();
