@@ -1,0 +1,57 @@
+/* mobile.js — navbar sottopagine */
+(function () {
+  var header = document.querySelector("header");
+  if (!header) return;
+
+  document.querySelectorAll(".hero").forEach(function (h) {
+    if (!h.querySelector(".hero-inner")) h.classList.add("nav-only");
+  });
+  if (document.getElementById("contact-form")) document.body.classList.add("contact-page");
+
+  function navbarScroll() {
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    header.classList.toggle("scrolled", y > 50);
+  }
+  window.addEventListener("scroll", navbarScroll, { passive: true });
+  navbarScroll();
+
+  var menu = header.querySelector("nav.links");
+  if (!menu) return;
+  menu.id = menu.id || "menu";
+
+  /* tieni un solo bottone */
+  var toggles = header.querySelectorAll(".nav-toggle");
+  for (var i = 1; i < toggles.length; i++) toggles[i].remove();
+  var toggle = toggles[0];
+  if (!toggle) {
+    toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "nav-toggle";
+    toggle.setAttribute("aria-label", "Apri menu");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", menu.id);
+    toggle.innerHTML = "<span></span><span></span><span></span>";
+    header.appendChild(toggle);
+  }
+
+  function setMenu(open) {
+    menu.classList.toggle("open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.setAttribute("aria-label", open ? "Chiudi menu" : "Apri menu");
+  }
+
+  /* un solo listener, in capture: nessun altro script può annullarlo */
+  document.addEventListener("click", function (e) {
+    if (e.target.closest(".nav-toggle")) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      setMenu(!menu.classList.contains("open"));
+    } else if (e.target.closest("nav.links a")) {
+      setMenu(false);
+    }
+  }, true);
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 720) setMenu(false);
+  });
+})();

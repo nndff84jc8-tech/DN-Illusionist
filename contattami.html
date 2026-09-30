@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<title>Contattami</title>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=EB+Garamond:wght@400;500;600&display=swap');
+
+:root{
+    --black:#0a0908;
+    --panel:#121110;
+    --ink:#e9e4d8;
+    --ink-dim:#8f8a7d;
+    --brass:#ad8a56;
+    --brass-bright:#d4b077;
+    --red:#d9534f;
+    --red-bright:#ff4d4d;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:var(--black);
+    color:var(--ink);
+    font-family:'EB Garamond', serif;
+    overflow-x:hidden;
+}
+
+/* =========================
+            HEADER / NAVBAR
+   (stili di base, validi per tutti gli schermi)
+========================= */
+
+header{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    z-index:1000;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:15px 6vw;
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    transition:
+        background-color .4s ease,
+        box-shadow .4s ease;
+}
+
+header.scrolled{
+    background:#000 !important;
+    box-shadow:0 4px 20px rgba(0,0,0,.45);
+}
+
+.brandmark{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Cinzel', serif;
+    font-size:15px;
+    letter-spacing:.14em;
+    color:var(--ink);
+    text-decoration:none;
+}
+
+.brandmark img{
+    display:block;
+    object-fit:contain;
+    mix-blend-mode:lighten;
+    transition:
+        transform .4s ease,
+        filter .4s ease;
+}
+
+.brandmark:hover img{
+    transform:scale(1.05);
+    filter:
+        drop-shadow(0 0 6px rgba(217,83,79,.9))
+        drop-shadow(0 0 14px rgba(217,83,79,.7))
+        drop-shadow(0 0 26px rgba(217,83,79,.4));
+}
+
+nav.links{
+    display:flex;
+    align-items:center;
+    gap:32px;
+}
+
+nav.links a{
+    position:relative;
+    display:inline-block;
+    color:var(--red);
+    text-shadow:0 0 10px rgba(217,83,79,.8);
+    font-family:'Cinzel', serif;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    padding:10px 0;
+    text-decoration:none;
+}
+
+nav.links a::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:2px;
+    width:0;
+    height:1px;
+    background:var(--red);
+    transform:translateX(-50%);
+    transition:width .4s ease;
+}
+
+nav.links a::before{
+    content:"✦";
+    position:absolute;
+    left:50%;
+    bottom:-17px;
+    font-size:12px;
+    color:var(--red);
+    text-shadow:0 0 10px rgba(217,83,79,.8);
+    opacity:0;
+    transform:
+        translateX(-50%)
+        translateY(4px);
+    transition:
+        opacity .35s ease,
+        transform .35s ease;
+}
+
+nav.links a:hover::after{
+    width:100%;
+}
+
+nav.links a:hover::before{
+    opacity:1;
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+.nav-toggle{
+    display:none;
+}
+
+nav.links .nav-coming{
+  color:#D9534F;
+  text-shadow:0 0 10px rgba(217,83,79,.8);
+  font-family:'Cinzel',serif;
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  padding:10px 0;
+  text-decoration:none;
+}
+
+/* contatti */
+
+.contatti{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:180px 20px 80px;
+}
+
+.contatti h2{
+    font-family:'Cinzel', serif;
+    color:#d9534f;
+    font-size:42px;
+    letter-spacing:5px;
+    margin-bottom:45px;
+    text-shadow:0 0 10px rgba(217,83,79,0.8);
+}
+
+.contatti p{
+    color:var(--ink-dim);
+    text-align:center;
+    max-width:700px;
+    font-size:20px;
+    line-height:1.5;
+    margin-bottom: 45px;
+}
+
+/* form */
+
+#contact-form{
+    width:100%;
+    max-width:600px;
+    background:var(--panel);
+    padding:40px;
+    border-radius:15px;
+    border:1px solid #d9534f;
+    box-shadow:
+    0 0 15px rgba(217,83,79,0.8),
+    0 0 35px rgba(217,83,79,0.4);
+}
+
+.campo{
+    margin-bottom:25px;
+}
+
+.campo label{
+    display:block;
+    color:#d9534f;
+    font-family:'Cinzel', serif;
+    font-size:16px;
+    letter-spacing:1px;
+    margin-bottom:10px;
+    text-shadow:0 0 8px rgba(217,83,79,0.7);
+}
+
+.campo input,
+.campo textarea{
+    width:100%;
+    padding:15px;
+    background:#0a0908;
+    border:1px solid #d9534f;
+    border-radius:8px;
+    color:var(--ink);
+    font-family:'EB Garamond', serif;
+    font-size:18px;
+}
+
+.campo textarea{
+    height:150px;
+    resize:none;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder{
+    color:#777;
+}
+
+/* =========================
+        CHECKBOX PRIVACY
+========================= */
+
+.campo-privacy{
+    margin-bottom:25px;
+}
+
+.privacy-label{
+    display:flex !important;
+    align-items:flex-start;
+    gap:12px;
+    cursor:pointer;
+    margin-bottom:0 !important;
+    font-family:'EB Garamond', serif !important;
+    font-size:16px !important;
+    line-height:1.4;
+    letter-spacing:0 !important;
+    color:var(--ink) !important;
+    text-shadow:none !important;
+}
+
+.privacy-label input[type="checkbox"]{
+    width:20px;
+    height:20px;
+    min-width:20px;
+    margin-top:2px;
+    padding:0;
+    accent-color:#d9534f;
+    cursor:pointer;
+}
+
+.privacy-label a{
+    color:#d9534f;
+    text-decoration:underline;
+}
+
+.privacy-label a:hover{
+    color:var(--red-bright);
+}
+
+.form-error{
+    display:none;
+    margin-top:10px;
+    color:var(--red-bright);
+    font-size:15px;
+    line-height:1.3;
+    text-shadow:0 0 8px rgba(217,83,79,0.6);
+}
+
+.form-error.visible{
+    display:block;
+}
+
+.campo-privacy.has-error .privacy-label input[type="checkbox"]{
+    outline:2px solid var(--red-bright);
+    outline-offset:2px;
+}
+
+/* btn*/
+
+button{
+    padding:15px 35px;
+    background:#d9534f;
+    color:#050f2c;
+    border:none;
+    border-radius:8px;
+    font-family:'Cinzel', serif;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+    box-shadow:0 0 15px rgba(217,83,79,0.6);
+}
+
+button:hover{
+    background:#ff4d4d;
+    transform:scale(1.05);
+    box-shadow:0 0 30px rgba(217,83,79,1);
+}
+
+/* footer oro */
+
+footer{
+    border-top:1px solid rgba(173,138,86,0.25);
+    padding:40px 6vw 50px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+    align-items:center;
+    justify-content:space-between;
+}
+
+footer .foot-name{
+    font-family:'Cinzel', serif;
+    font-size:13px;
+    letter-spacing:0.18em;
+    color:var(--ink-dim);
+}
+
+footer .socials{
+    display:flex;
+    gap:22px;
+}
+
+footer a{
+    color:var(--ink-dim);
+    text-decoration:none;
+    font-family:'EB Garamond', serif;
+    font-size:14px;
+    letter-spacing:0.05em;
+    transition:.3s;
+}
+
+footer a:hover{
+    color:var(--red-bright);
+}
+
+/* btn torna su */
+
+.back-top{
+    position:fixed;
+    right:25px;
+    bottom:35px;
+    width:45px;
+    height:45px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#111;
+    border:2px solid #d9534f;
+    border-radius:12px;
+    z-index:999;
+    box-shadow:0 0 10px rgba(217,83,79,.8);
+    transition:.3s ease;
+}
+
+.back-top span{
+    width:14px;
+    height:14px;
+    border-left:5px solid #d9534f;
+    border-top:5px solid #d9534f;
+    transform:rotate(45deg);
+    margin-top:8px;
+    filter:drop-shadow(0 0 6px #d9534f);
+}
+
+.back-top:hover{
+    background:#d9534f;
+    transform:translateY(-8px);
+    box-shadow:
+    0 0 20px rgba(217,83,79,1),
+    0 0 45px rgba(217,83,79,.8);
+}
+
+.back-top:hover span{
+    border-color:white;
+    filter:drop-shadow(0 0 8px white);
+}
+
+/* mobile */
+
+@media(max-width:768px){
+
+    footer{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .contatti h2{
+        font-size:32px;
+    }
+}
+
+/* =========================
+   RIAPRI COOKIE
+   (stessa struttura di .back-top: stessa
+   grandezza, colore ed effetto hover)
+========================= */
+
+.cookie-reopen{
+  position:fixed;
+  right:25px;
+  bottom:90px;
+  width:45px;
+  height:45px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#111;
+  border:2px solid #d9534f;
+  border-radius:12px;
+  text-decoration:none;
+  font-size:20px;
+  line-height:1;
+  cursor:pointer;
+  box-shadow:
+    0 0 10px rgba(217,83,79,.8),
+    0 0 25px rgba(217,83,79,.5);
+  transition:.3s ease;
+  z-index:999;
+}
+
+.cookie-reopen:hover{
+  background:#d9534f;
+  transform:translateY(-8px);
+  box-shadow:
+    0 0 20px rgba(217,83,79,1),
+    0 0 45px rgba(217,83,79,.8);
+}
+
+/* cookie banner */
+
+#cookie-banner{
+  position:fixed;
+  right:25px;
+  bottom:25px;
+  width:360px;
+  max-width:calc(100vw - 40px);
+  background:#0a0908;
+  border:1px solid #D9534F;
+  border-radius:12px;
+  padding:20px;
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  box-shadow:
+    0 10px 40px rgba(0,0,0,.8),
+    0 0 20px rgba(217,83,79,.25);
+  font-family:'EB Garamond',serif;
+  opacity:1;
+  transform:translateY(0);
+  transition:
+    opacity .4s ease,
+    transform .4s ease;
+  /* SOPRA ASSOLUTAMENTE TUTTO */
+  z-index:2147483647;
+}
+
+/* ICONA BISCOTTO */
+
+.cookie-icon{
+  font-size:28px;
+  line-height:1;
+  flex-shrink:0;
+}
+
+/* CONTENUTO */
+
+.cookie-content{
+  flex:1;
+}
+
+.cookie-title{
+  color:#D9534F;
+  font-family:'Cinzel',serif;
+  font-size:13px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+
+.cookie-text{
+  color:#e9e4d8;
+  font-size:15px;
+  line-height:1.4;
+}
+
+/* BOTTONI */
+
+.cookie-buttons{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:15px;
+}
+
+.cookie-buttons button{
+  padding:8px 15px;
+  border:1px solid #D9534F;
+  background:transparent;
+  color:#D9534F;
+  border-radius:5px;
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:.1em;
+  cursor:pointer;
+  transition:.3s ease;
+}
+
+.cookie-buttons button:hover{
+  background:#D9534F;
+  color:#000;
+}
+
+#cookie-accept{
+  background:#D9534F;
+  color:#000;
+}
+
+#cookie-accept:hover{
+  background:#fff;
+  border-color:#fff;
+}
+
+/* NASCOSTO */
+
+#cookie-banner.hidden{
+  opacity:0;
+  transform:translateY(30px);
+  pointer-events:none;
+}
+
+@media(max-width:600px){
+
+  #cookie-banner{
+    right:15px;
+    bottom:15px;
+    width:calc(100vw - 30px);
+    max-width:none;
+    padding:17px;
+  }
+
+  .cookie-icon{
+    font-size:25px;
+  }
+
+  .cookie-text{
+    font-size:14px;
+  }
+
+  .cookie-buttons{
+    margin-top:12px;
+  }
+
+  .cookie-buttons button{
+    flex:1;
+  }
+
+}
+
+/* =========================
+   RIDUZIONE ANIMAZIONI
+========================= */
+
+.cookie-text a{
+    color:#fff;
+    text-decoration:underline;
+}
+
+.cookie-text a:visited{
+    color:#fff;
+}
+
+.cookie-text a:hover{
+    color:#fff;
+}
+
+@media(prefers-reduced-motion:reduce){
+
+  *{
+    animation-duration:.01ms !important;
+    transition-duration:.01ms !important;
+  }
+
+}
+
+</style>
+   <link rel="stylesheet" href="mobile.css?v=5">
+
+</head>
+
+<body>
+<div id="cookie-banner" class="hidden">
+
+  <div class="cookie-icon">
+    🍪
+  </div>
+
+  <div class="cookie-content">
+
+    <div class="cookie-title">
+      Cookie Policy
+    </div>
+
+    <div class="cookie-text">
+       Questo sito utilizza <a href ="cookie-policy.html" target="_blank"
+      rel="noopener noreferrer"> cookie </a>e contenuti
+      di terze parti, come i video YouTube.
+      Puoi scegliere se accettarli.
+    </div>
+
+    <div class="cookie-buttons">
+
+      <button type="button" id="cookie-reject">
+        RIFIUTA
+      </button>
+
+      <button type="button" id="cookie-accept">
+        ACCETTA
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<header>
+
+    <a href="index.html" class="brandmark">
+        <img src="img/logo1.jpg" height="120">
+    </a>
+
+    <nav class="links" id="menu">
+
+        <a href="index.html">Home</a>
+<a href="biografia.html">BIOGRAFIA</a>
+        <a href="btncart.html">CARTOMAGIA</a>
+
+        <a href="btnescap.html">ESCAPOLOGIA</a>
+
+          <p class="nav-coming">
+  L'ARTE DELLA MAGIA
+  <br> ㅤ~ Coming soon ~
+</p>
+    </nav>
+
+
+<button class="nav-toggle" type="button" aria-label="Apri menu" aria-expanded="false" aria-controls="menu">
+  <span></span><span></span><span></span>
+</button>
+</header>
+
+<section class="contatti">
+
+<h2>CONTATTAMI</h2>
+
+<p>
+Hai bisogno di informazioni, vuoi organizzare uno spettacolo
+o semplicemente vuoi scoprire di più sulla magia?
+</p>
+
+<form id="contact-form">
+
+<div class="campo">
+<label>Nome</label>
+<input type="text" name="name" placeholder="Inserisci il tuo nome" required>
+</div>
+
+<div class="campo">
+<label>Email</label>
+<input type="email" name="email" placeholder="La tua email" required>
+</div>
+
+<div class="campo">
+<label>Messaggio</label>
+<textarea name="message" placeholder="Scrivi il tuo messaggio..." required></textarea>
+</div>
+
+<!-- CONSENSO PRIVACY -->
+<div class="campo campo-privacy" id="privacy-box">
+
+<label class="privacy-label" for="privacy-check">
+
+<input type="checkbox" id="privacy-check" name="privacy" value="accettata" aria-describedby="privacy-error">
+
+<span>
+Ho letto l'<a href="privacy-policy.html" target="_blank" rel="noopener noreferrer">Informativa sulla Privacy</a>
+e acconsento al trattamento dei miei dati personali.
+</span>
+
+</label>
+
+<div class="form-error" id="privacy-error" role="alert">
+Per inviare il messaggio devi accettare l'Informativa sulla Privacy.
+</div>
+
+</div>
+
+<button type="submit">
+
+INVIA MESSAGGIO
+
+</button>
+
+</form>
+
+</section>
+
+<footer>
+
+<div class="foot-name">
+
+Davide Novali — Illusionismo
+
+</div>
+
+<div class="socials">
+
+<a href="https://youtube.com/@illusionist-dav?si=SL8r2-sN-QyBJTDB" target="_blank">
+
+YouTube
+
+</a>
+
+<span class="footer-divider">|</span>
+
+    <a
+      href="privacy-policy.html"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Privacy Policy
+    </a>
+
+    <a
+      href="cookie-policy.html"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Cookie Policy
+    </a>
+
+    <a
+      href="note-legali.html"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Note Legali
+    </a>
+</div>
+
+</footer>
+
+<a href="#" class="back-top">
+
+<span></span>
+
+</a>
+
+<script>
+
+emailjs.init({
+
+publicKey:"UtCA0Vo6r6Qpan5xH"
+
+});
+
+const privacyCheck = document.getElementById("privacy-check");
+const privacyBox   = document.getElementById("privacy-box");
+const privacyError = document.getElementById("privacy-error");
+
+/* Se l'utente spunta la casella, l'errore sparisce subito */
+privacyCheck.addEventListener("change", function(){
+
+    if(privacyCheck.checked){
+        privacyError.classList.remove("visible");
+        privacyBox.classList.remove("has-error");
+    }
+
+});
+
+document
+.getElementById("contact-form")
+.addEventListener("submit",function(event){
+
+event.preventDefault();
+
+/* Controllo consenso privacy: se non spuntato, mostra errore e blocca l'invio */
+if(!privacyCheck.checked){
+
+    privacyError.classList.add("visible");
+    privacyBox.classList.add("has-error");
+    privacyBox.scrollIntoView({ behavior:"smooth", block:"center" });
+
+    return;
+
+}
+
+emailjs.sendForm(
+
+"service_magia",
+
+"template_g79f2sa",
+
+this
+
+)
+
+.then(()=>{
+
+alert("Messaggio inviato!");
+
+this.reset();
+
+privacyError.classList.remove("visible");
+privacyBox.classList.remove("has-error");
+
+})
+
+.catch((error)=>{
+
+alert("Errore: "+JSON.stringify(error));
+
+});
+
+});
+
+/* Header: aggiunge la classe "scrolled" dopo un po' di scroll */
+
+const siteHeader = document.querySelector("header");
+
+window.addEventListener("scroll", function(){
+
+    if(window.scrollY > 40){
+        siteHeader.classList.add("scrolled");
+    } else {
+        siteHeader.classList.remove("scrolled");
+    }
+
+});
+
+</script>
+
+<button
+  type="button"
+  id="cookie-reopen"
+  class="cookie-reopen"
+  aria-label="Gestisci preferenze cookie"
+>
+  🍪
+</button>
+   <script src="menu.js"></script>
+<script src="card.js"></script>
+</body>
+
+</html>
